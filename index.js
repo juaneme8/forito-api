@@ -30,14 +30,17 @@ const getLastPage = async () => {
 
 app.get('/', async (req, res) => {
 	const lastPage = await getLastPage();
-	console.log(lastPage);
+
+	console.log('Starting');
 	for (let i = 0; i < WANTEDpAGES; i++) {
 		const currentPage = lastPage - i;
-		console.log({ currentPage });
-
+		// console.log({ currentPage });
+		console.log(`Loading Page ${currentPage}...`);
 		await axios.get(`${baseURL}${currentPage}`).then(response => {
 			const html = response.data;
 			const $ = cheerio.load(html, { decodeEntities: false });
+
+			console.log(`Page ${currentPage}: OK`);
 
 			$('li.postbitlegacy').each((idx, item) => {
 				const date = $(item).find('.date').text();
@@ -49,12 +52,13 @@ app.get('/', async (req, res) => {
 				// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
 
 				// console.log(li)
-				if (likes > 2) {
+				if (likes > 1) {
 					posts.push({ currentPage, date, content, likes, link });
 				}
 			});
 		});
 	}
+	console.log('Sending Response');
 	res.json(posts);
 });
 
