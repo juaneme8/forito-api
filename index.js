@@ -5,8 +5,8 @@ const cheerio = require('cheerio');
 const app = express();
 
 const PORT = 3001;
-const WANTEDpAGES = 2;
-const posts = [];
+const WANTEDpAGES = 3;
+
 // const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina?goto=newpost'
 const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina/page';
 
@@ -26,9 +26,10 @@ const getLastPage = async () => {
 	}
 };
 
-// [result1, result2] = Promise.all([async1(), async2()]);
+// \n\t\t\t\n\t\t\n\t\n
 
 app.get('/', async (req, res) => {
+	const posts = [];
 	const lastPage = await getLastPage();
 
 	console.log('Starting');
