@@ -4,7 +4,7 @@ const cheerio = require('cheerio');
 
 const app = express();
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 const WANTEDpAGES = 10;
 
 // const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina?goto=newpost'
