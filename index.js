@@ -5,7 +5,6 @@ const cheerio = require('cheerio');
 const app = express();
 
 const PORT = process.env.PORT || 3001;
-const WANTEDpAGES = 10;
 
 // const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina?goto=newpost'
 const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina/page';
@@ -31,14 +30,21 @@ app.get('/', async (req, res) => {
 	const posts = [];
 	const lastPage = await getLastPage();
 
+	const { pages: wantedPages } = req.query.pages;
+
+	if (!wantedPages) {
+		wantedPages = 1;
+	}
 
 	console.log({ lastPage })
 
-	const pages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+	let pagesArr = [];
+	for (let i = 0; i < wantedPages; i++)
+		pagesArr.push(i)
 
 	try {
 
-		const promises = pages.map(page => axios.get(`${baseURL}${lastPage - page}`))
+		const promises = pagesArr.map(page => axios.get(`${baseURL}${lastPage - page}`))
 		const responses = await Promise.all(promises)
 
 		responses.forEach(response => {
