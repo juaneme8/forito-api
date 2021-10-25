@@ -17,7 +17,6 @@ const getLastPage = async () => {
 
 		const $ = cheerio.load(html, { decodeEntities: false });
 
-
 		const lastPageLink = $('.first_last').last().find('a').attr('href');
 
 		return lastPageLink.split('page')[1].split('?')[0];
@@ -32,16 +31,22 @@ app.get('/', async (req, res) => {
 	const posts = [];
 	const lastPage = await getLastPage();
 
-	console.log('Starting');
-	for (let i = 0; i < WANTEDpAGES; i++) {
-		const currentPage = lastPage - i;
-		// console.log({ currentPage });
-		console.log(`Loading Page ${currentPage}...`);
-		await axios.get(`${baseURL}${currentPage}`).then(response => {
+
+	console.log({ lastPage })
+
+	const pages = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+
+	try {
+
+		const promises = pages.map(page => axios.get(`${baseURL}${lastPage - page}`))
+		const responses = await Promise.all(promises)
+
+		responses.forEach(response => {
+
 			const html = response.data;
 			const $ = cheerio.load(html, { decodeEntities: false });
 
-			console.log(`Page ${currentPage}: OK`);
+		// console.log(`Page ${currentPage}: OK`);
 
 			$('li.postbitlegacy').each((idx, item) => {
 				const date = $(item).find('.date').text();
@@ -49,18 +54,23 @@ app.get('/', async (req, res) => {
 				const likes = $(item).find('.likes').text();
 				const link = 'https://foros.3dgames.com.ar/' + $(item).find('.postcounter').attr('href');
 
-				// const postNumber = linkAndStuff.split('#')[1];
-				// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
+			// const postNumber = linkAndStuff.split('#')[1];
+			// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
 
 				// console.log(li)
 				if (likes > 5) {
-					posts.push({ currentPage, date, content, likes, link });
+					posts.push({ date, content, likes, link });
 				}
 			});
-		});
+
+		})
+		console.log('Sending Response');
+		res.json(posts);
 	}
-	console.log('Sending Response');
-	res.json(posts);
+	catch (e) {
+		console.log(e)
+	}
+
 });
 
 app.get('/posts', (req, res) => {
