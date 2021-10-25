@@ -30,7 +30,7 @@ app.get('/', async (req, res) => {
 	const posts = [];
 	const lastPage = await getLastPage();
 
-	const { pages: wantedPages } = req.query.pages;
+	const { pages: wantedPages } = req.query
 
 	if (!wantedPages) {
 		wantedPages = 1;
