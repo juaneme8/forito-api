@@ -30,29 +30,27 @@ app.get('/', async (req, res) => {
 	const posts = [];
 	const lastPage = await getLastPage();
 
-	const { pages: wantedPages } = req.query
+	let { pages: wantedPages } = req.query;
 
 	if (!wantedPages) {
 		wantedPages = 1;
 	}
 
-	console.log({ lastPage })
+	console.log({ lastPage });
 
 	let pagesArr = [];
-	for (let i = 0; i < wantedPages; i++)
-		pagesArr.push(i)
+	for (let i = 0; i < wantedPages; i++) pagesArr.push(i);
 
 	try {
+		const promises = pagesArr.map(page => axios.get(`${baseURL}${lastPage - page}`));
+		const responses = await Promise.all(promises);
 
-		const promises = pagesArr.map(page => axios.get(`${baseURL}${lastPage - page}`))
-		const responses = await Promise.all(promises)
-
-		responses.forEach(response => {
-
+		responses.forEach((response, index) => {
+			console.log({ index });
 			const html = response.data;
 			const $ = cheerio.load(html, { decodeEntities: false });
 
-		// console.log(`Page ${currentPage}: OK`);
+			// console.log(`Page ${currentPage}: OK`);
 
 			$('li.postbitlegacy').each((idx, item) => {
 				const date = $(item).find('.date').text();
@@ -60,23 +58,20 @@ app.get('/', async (req, res) => {
 				const likes = $(item).find('.likes').text();
 				const link = 'https://foros.3dgames.com.ar/' + $(item).find('.postcounter').attr('href');
 
-			// const postNumber = linkAndStuff.split('#')[1];
-			// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
+				// const postNumber = linkAndStuff.split('#')[1];
+				// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
 
 				// console.log(li)
 				if (likes > 5) {
 					posts.push({ date, content, likes, link });
 				}
 			});
-
-		})
+		});
 		console.log('Sending Response');
 		res.json(posts);
+	} catch (e) {
+		console.log(e);
 	}
-	catch (e) {
-		console.log(e)
-	}
-
 });
 
 app.get('/posts', (req, res) => {
