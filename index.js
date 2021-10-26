@@ -1,4 +1,4 @@
-const { default: axios } = require('axios');
+const axios = require('axios');
 const express = require('express');
 const cheerio = require('cheerio');
 
@@ -8,6 +8,7 @@ const PORT = process.env.PORT || 3001;
 
 // const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina?goto=newpost'
 const baseURL = 'https://foros.3dgames.com.ar/threads/942062-ofertas-online-argentina/page';
+
 
 const getLastPage = async () => {
 	try {
@@ -42,19 +43,27 @@ app.get('/', async (req, res) => {
 	for (let i = 0; i < wantedPages; i++) pagesArr.push(i);
 
 	try {
-		const promises = pagesArr.map(page => axios.get(`${baseURL}${lastPage - page}`));
+
+
+		const promises = pagesArr.map(page => axios.request({ method: 'GET', url: `${baseURL}${lastPage - page}`, responseType: 'arraybuffer', eponseEncoding: 'binary' }));
 		const responses = await Promise.all(promises);
 
 		responses.forEach((response, index) => {
 			console.log({ index });
-			const html = response.data;
-			const $ = cheerio.load(html, { decodeEntities: false });
+
+			const html = response.data.toString('latin1');
+
+			// console.log(html)
+			// const $ = cheerio.load(html, { decodeEntities: false });
+			const $ = cheerio.load(html);
+
+			// console.log($.html())
 
 			// console.log(`Page ${currentPage}: OK`);
 
 			$('li.postbitlegacy').each((idx, item) => {
 				const date = $(item).find('.date').text();
-				const content = $(item).find('blockquote.postcontent').text();
+				const content = $(item).find('blockquote.postcontent').text().trim();
 				const likes = $(item).find('.likes').text();
 				const link = 'https://foros.3dgames.com.ar/' + $(item).find('.postcounter').attr('href');
 
