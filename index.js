@@ -25,6 +25,7 @@ const getLastPage = async () => {
 	}
 };
 
+
 // \n\t\t\t\n\t\t\n\t\n
 
 app.get('/', async (req, res) => {
@@ -73,6 +74,9 @@ app.get('/', async (req, res) => {
 				if (likes >= wantedLikes) {
 					posts.push({ date, content, likes, link, postCounter });
 				}
+				posts.sort(function (a, b) {
+					return b.postCounter - a.postCounter;
+				});
 			});
 		});
 		console.log('Sending Response');
