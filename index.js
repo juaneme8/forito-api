@@ -31,11 +31,7 @@ app.get('/', async (req, res) => {
 	const posts = [];
 	const lastPage = await getLastPage();
 
-	let { pages: wantedPages, likes: wantedLikes } = req.query;
-
-	if (!wantedPages) {
-		wantedPages = 1;
-	}
+	const { pages: wantedPages = 10, likes: wantedLikes = 0 } = req.query;
 
 	console.log({ lastPage });
 
@@ -43,9 +39,11 @@ app.get('/', async (req, res) => {
 	for (let i = 0; i < wantedPages; i++) pagesArr.push(i);
 
 	try {
-
-
-		const promises = pagesArr.map(page => axios.request({ method: 'GET', url: `${baseURL}${lastPage - page}`, responseType: 'arraybuffer', eponseEncoding: 'binary' }));
+		const promises = pagesArr.map(page => axios.request({
+			method: 'GET', url: `${baseURL}${lastPage - page}`,
+			responseType: 'arraybuffer',
+			eponseEncoding: 'binary'
+		}));
 		const responses = await Promise.all(promises);
 
 		responses.forEach((response, index) => {
@@ -72,7 +70,7 @@ app.get('/', async (req, res) => {
 				// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
 
 				// console.log(li)
-				if (likes > wantedLikes) {
+				if (likes >= wantedLikes) {
 					posts.push({ date, content, likes, link, postCounter });
 				}
 			});
