@@ -32,9 +32,12 @@ app.get('/', async (req, res) => {
 	const posts = [];
 	const lastPage = await getLastPage();
 
-	const { pages: wantedPages = 10, likes: wantedLikes = 0 } = req.query;
+	const { pages, likes } = req.query;
 
-	console.log({ lastPage });
+	const wantedPages = pages ? parseInt(pages) : 10;
+	const wantedLikes = likes ? parseInt(likes) : 0;
+
+	console.log(`${wantedPages}/${wantedLikes}/${lastPage}`);
 
 	let pagesArr = [];
 	for (let i = 0; i < wantedPages; i++) pagesArr.push(i);
@@ -43,7 +46,7 @@ app.get('/', async (req, res) => {
 		const promises = pagesArr.map(page => axios.request({
 			method: 'GET', url: `${baseURL}${lastPage - page}`,
 			responseType: 'arraybuffer',
-			eponseEncoding: 'binary'
+			reponseEncoding: 'binary'
 		}));
 		const responses = await Promise.all(promises);
 
@@ -63,22 +66,23 @@ app.get('/', async (req, res) => {
 			$('li.postbitlegacy').each((idx, item) => {
 				const date = $(item).find('.date').text();
 				const content = $(item).find('blockquote.postcontent').text().trim();
-				const likes = $(item).find('.likes').text();
+				const likes = parseInt($(item).find('.likes').text());
 				const postCounter = $(item).find('.postcounter').text().slice(1);
 				const link = 'https://foros.3dgames.com.ar/' + $(item).find('.postcounter').attr('href');
 
 				// const postNumber = linkAndStuff.split('#')[1];
 				// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
 
-				// console.log(li)
-				if (likes >= wantedLikes) {
+				if (likes > wantedLikes) {
 					posts.push({ date, content, likes, link, postCounter });
 				}
-				posts.sort(function (a, b) {
-					return b.postCounter - a.postCounter;
-				});
+
 			});
 		});
+		posts.sort(function (a, b) {
+			return b.postCounter - a.postCounter;
+		});
+
 		console.log('Sending Response');
 		res.json(posts);
 	} catch (e) {
