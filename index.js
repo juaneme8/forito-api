@@ -63,7 +63,7 @@ app.get('/', async (req, res) => {
 				const date = $(item).find('.date').text();
 				const content = $(item).find('blockquote.postcontent').text().trim();
 				const likes = $(item).find('.likes').text();
-				const postCounter = $(item).find('.postcounter').slice(1).text();
+				const postCounter = $(item).find('.postcounter').text().slice(1);
 				const link = 'https://foros.3dgames.com.ar/' + $(item).find('.postcounter').attr('href');
 
 				// const postNumber = linkAndStuff.split('#')[1];
