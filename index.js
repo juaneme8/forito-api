@@ -73,7 +73,7 @@ app.get('/', async (req, res) => {
 				// const postNumber = linkAndStuff.split('#')[1];
 				// const link = `${linkAndStuff.split('?')[0]}/page${currentPage}#post${postNumber}`;
 
-				if (likes > wantedLikes) {
+				if (likes >= wantedLikes) {
 					posts.push({ date, content, likes, link, postCounter });
 				}
 
