@@ -1,2 +1,6 @@
 # forito-api
-Server Express encargado de scrapear posts de un Foro a fin de obtener resultados de varias páginas filtrando también  por cantidad de likes.
+Express server to scrap posts from a forum site in order to get results in pages with the ability to filter by number of likes.
+
+## Getting started
+To test app locally
+http://localhost:3001/?pages=10&likes=5
